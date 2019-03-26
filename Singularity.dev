@@ -1,0 +1,95 @@
+Bootstrap: yum
+OSVersion: 7
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
+Include: yum
+
+%post
+    # Prereqs
+    yum install -y wget file bc tar gzip libquadmath gcc git which bzip2
+    wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.sh
+    /bin/bash cmake-3.14.0-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
+
+%appinstall minc
+    tmpdir=$(mktemp -d)
+    pushd $tmpdir
+    git clone --recursive --branch release-1.9.16 https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2_src
+    mkdir minc_build
+    pushd minc_build
+    /opt/cmake/bin/cmake ../minc-toolkit-v2_src \
+    -DCMAKE_BUILD_TYPE:STRING=Release \
+    -DCMAKE_INSTALL_PREFIX:PATH=$SCIF_APPROOT \
+    -DMT_BUILD_ABC:BOOL=OFF \
+    -DMT_BUILD_ANTS:BOOL=OFF \
+    -DMT_BUILD_C3D:BOOL=OFF \
+    -DMT_BUILD_ELASTIX:BOOL=OFF \
+    -DMT_BUILD_IM:BOOL=OFF \
+    -DMT_BUILD_ITK_TOOLS:BOOL=OFF \
+    -DMT_BUILD_LITE:BOOL=OFF \
+    -DMT_BUILD_OPENBLAS:BOOL=ON \
+    -DMT_BUILD_QUIET:BOOL=OFF \
+    -DMT_BUILD_SHARED_LIBS:BOOL=OFF \
+    -DMT_BUILD_VISUAL_TOOLS:BOOL=OFF \
+    -DMT_USE_OPENMP:BOOL=ON \
+    -DUSE_SYSTEM_FFTW3D:BOOL=OFF \
+    -DUSE_SYSTEM_FFTW3F:BOOL=OFF \
+    -DUSE_SYSTEM_GLUT:BOOL=OFF \
+    -DUSE_SYSTEM_GSL:BOOL=OFF \
+    -DUSE_SYSTEM_HDF5:BOOL=OFF \
+    -DUSE_SYSTEM_ITK:BOOL=OFF \
+    -DUSE_SYSTEM_NETCDF:BOOL=OFF \
+    -DUSE_SYSTEM_NIFTI:BOOL=OFF \
+    -DUSE_SYSTEM_PCRE:BOOL=OFF \
+    -DUSE_SYSTEM_ZLIB:BOOL=OFF \
+    -DBUILD_TESTING=OFF
+    make
+    make install
+    popd  # minc_build
+    rm -rf minc_build
+    rm -rf minc-toolkit-v2_src
+    popd  # $tmpdir
+
+%appenv minc
+    export PATH=/opt/minc/bin:$PATH
+
+%appinstall ants
+    tmpdir=$(mktemp -d)
+    pushd $tmpdir
+    git clone --branch v2.3.1 https://github.com/ANTsX/ANTs.git ANTs_src
+    mkdir ANTS_build
+    pushd ANTS_build
+    cmake ../ANTs_src \
+    -DITK_BUILD_MINC_SUPPORT=ON \
+    make
+    make install
+    popd  # ANTS_build
+    cp ANTs_src/Scripts/* $SCIF_APPBIN_ants/
+    cp ANTs_build/bin/* $SCIF_APPBIN_ants/
+    popd  # $tmpdir
+
+%appenv
+    export PATH=/opt/ANTs/bin:$PATH
+
+%appinstall freesurfer
+    wget --no-verbose https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    tar -C $SCIF_APPROOT -xzvf freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    rm freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+
+%appenv freesurfer
+    export FREESURFER_HOME=$SCIF_APPROOT
+    source $FREESURFER_HOME/SetUpFreeSurfer.sh
+
+%appinstall FSL
+    wget --output-document=/tmp/fslinstaller.py https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py 
+    # FSL gets upset if it tries to install into a non-empty directory
+    # so here we remove the directory, install fsl, and then restore the scif metadata
+    cd ..
+    mv $SCIF_APPROOT/scif /tmp/scif
+    rmdir $SCIF_APPROOT/bin
+    rmdir $SCIF_APPROOT/lib
+    rmdir $SCIF_APPROOT
+    python /tmp/fslinstaller.py -V 6.0.1 -d $SCIF_APPROOT
+    cd $SCIF_APPROOT
+    mv /tmp/scif scif
+
+%appenv FSL
+    source $SCIF_APPROOT/etc/fslconf/fsl.sh
