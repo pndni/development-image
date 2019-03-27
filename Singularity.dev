@@ -5,7 +5,7 @@ Include: yum
 
 %post
     # Prereqs
-    yum install -y wget file bc tar gzip libquadmath git which bzip2
+    yum install -y wget file bc tar gzip libquadmath git which bzip2 zlib zlib-devel
     yum groupinstall -y "Development Tools"
     wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.sh
     mkdir -p /opt/cmake
