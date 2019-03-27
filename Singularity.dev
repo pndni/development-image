@@ -57,7 +57,7 @@ Include: yum
     mkdir ANTS_build
     pushd ANTS_build
     /opt/cmake/bin/cmake ../ANTs_src \
-    -DITK_BUILD_MINC_SUPPORT=ON \
+    -DITK_BUILD_MINC_SUPPORT=ON
     make
     make install
     popd  # ANTS_build
