@@ -1,8 +1,7 @@
-Bootstrap: localimage
-From: centos-base.simg
-#OSVersion: 7
-#MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
-#Include: yum
+Bootstrap: yum
+OSVersion: 7
+MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
+Include: yum
 
 %post
     # Prereqs
@@ -51,9 +50,6 @@ From: centos-base.simg
     rm -rf minc-toolkit-v2_src
     popd  # $tmpdir
 
-%appenv minc
-    export PATH=/opt/minc/bin:$PATH
-
 %appinstall ants
     tmpdir=$(mktemp -d)
     pushd $tmpdir
@@ -69,16 +65,13 @@ From: centos-base.simg
     cp ANTs_build/bin/* $SCIF_APPBIN_ants/
     popd  # $tmpdir
 
-%appenv
-    export PATH=/opt/ANTs/bin:$PATH
-
 %appinstall freesurfer
     wget --no-verbose https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
-    tar -C $SCIF_APPROOT -xzvf freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    tar -C $SCIF_APPROOT/.. -xzvf freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
     rm freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
 
 %appenv freesurfer
-    export FREESURFER_HOME=$SCIF_APPROOT
+    export FREESURFER_HOME=/scif/app/freesurfer
     source $FREESURFER_HOME/SetUpFreeSurfer.sh
 
 %appinstall FSL
@@ -95,4 +88,4 @@ From: centos-base.simg
     mv /tmp/scif scif
 
 %appenv FSL
-    source $SCIF_APPROOT/etc/fslconf/fsl.sh
+    source /scif/app/fsl/etc/fslconf/fsl.sh
