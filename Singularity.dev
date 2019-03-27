@@ -1,7 +1,8 @@
-Bootstrap: yum
-OSVersion: 7
-MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
-Include: yum
+Bootstrap: localimage
+From: centos-base.simg
+#OSVersion: 7
+#MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
+#Include: yum
 
 %post
     # Prereqs
@@ -59,7 +60,7 @@ Include: yum
     git clone --branch v2.3.1 https://github.com/ANTsX/ANTs.git ANTs_src
     mkdir ANTS_build
     pushd ANTS_build
-    cmake ../ANTs_src \
+    /opt/cmake/bin/cmake ../ANTs_src \
     -DITK_BUILD_MINC_SUPPORT=ON \
     make
     make install
