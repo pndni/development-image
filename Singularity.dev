@@ -1,5 +1,5 @@
 Bootstrap: shub
-From: pndni/minc-and-ants:1.0.1
+From: pndni/minc-and-ants-container:1.0.1
 # OSVersion: 7
 # MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
 # Include: yum
