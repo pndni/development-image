@@ -1,72 +1,21 @@
-Bootstrap: yum
-OSVersion: 7
-MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
-Include: yum
-
+Bootstrap: shub
+From: pndni/minc-and-ants:1.0.1
+# OSVersion: 7
+# MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
+# Include: yum
+#
 %post
-    # Prereqs
-    yum install -y wget file bc tar gzip libquadmath git which bzip2 zlib zlib-devel libgomp
-    yum groupinstall -y "Development Tools"
-    wget https://github.com/Kitware/CMake/releases/download/v3.14.0/cmake-3.14.0-Linux-x86_64.sh
-    mkdir -p /opt/cmake
-    /bin/bash cmake-3.14.0-Linux-x86_64.sh --prefix=/opt/cmake --skip-license
 
-    tmpdir=$(mktemp -d)
-    pushd $tmpdir
-    git clone --recursive --branch release-1.9.16 https://github.com/BIC-MNI/minc-toolkit-v2.git minc-toolkit-v2_src
-    mkdir minc_build
-    pushd minc_build
-    /opt/cmake/bin/cmake ../minc-toolkit-v2_src \
-    -DCMAKE_BUILD_TYPE:STRING=Release \
-    -DCMAKE_INSTALL_PREFIX:PATH=/opt/minc \
-    -DMT_BUILD_ABC:BOOL=OFF \
-    -DMT_BUILD_ANTS:BOOL=OFF \
-    -DMT_BUILD_C3D:BOOL=OFF \
-    -DMT_BUILD_ELASTIX:BOOL=OFF \
-    -DMT_BUILD_IM:BOOL=OFF \
-    -DMT_BUILD_ITK_TOOLS:BOOL=OFF \
-    -DMT_BUILD_LITE:BOOL=OFF \
-    -DMT_BUILD_OPENBLAS:BOOL=ON \
-    -DMT_BUILD_QUIET:BOOL=OFF \
-    -DMT_BUILD_SHARED_LIBS:BOOL=OFF \
-    -DMT_BUILD_VISUAL_TOOLS:BOOL=OFF \
-    -DMT_USE_OPENMP:BOOL=ON \
-    -DUSE_SYSTEM_FFTW3D:BOOL=OFF \
-    -DUSE_SYSTEM_FFTW3F:BOOL=OFF \
-    -DUSE_SYSTEM_GLUT:BOOL=OFF \
-    -DUSE_SYSTEM_GSL:BOOL=OFF \
-    -DUSE_SYSTEM_HDF5:BOOL=OFF \
-    -DUSE_SYSTEM_ITK:BOOL=OFF \
-    -DUSE_SYSTEM_NETCDF:BOOL=OFF \
-    -DUSE_SYSTEM_NIFTI:BOOL=OFF \
-    -DUSE_SYSTEM_PCRE:BOOL=OFF \
-    -DUSE_SYSTEM_ZLIB:BOOL=OFF \
-    -DBUILD_TESTING=OFF
-    make
-    make install
-    popd  # minc_build
-    rm -rf minc_build
-    rm -rf minc-toolkit-v2_src
-    popd  # $tmpdir
-
-    tmpdir=$(mktemp -d)
-    pushd $tmpdir
-    git clone --branch v2.3.1 https://github.com/ANTsX/ANTs.git ANTs_src
-    mkdir ANTS_build
-    pushd ANTS_build
-    /opt/cmake/bin/cmake ../ANTs_src \
-    -DITK_BUILD_MINC_SUPPORT=ON
-    make
-    popd  # ANTS_build
-    mkdir -p /opt/ants/bin
-    cp ANTs_src/Scripts/* /opt/ants/bin/
-    cp ANTs_build/bin/* /opt/ants/bin/
-    popd  # $tmpdir
+    ##############################
+    # heudiconv/dcm2niix prereqs #
+    # ############################
+    yum install -y epel-release
+    yum install -y python36 python36-pip python36-devel libstdc++-static pigz python36-virtualenv
 
     ##############
     # freesurfer #
     ##############
-    wget --no-verbose --output-document=/root/freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.0/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.0.tar.gz
+    wget --no-verbose --output-document=/root/freesurfer.tar.gz https://surfer.nmr.mgh.harvard.edu/pub/dist/freesurfer/6.0.1/freesurfer-Linux-centos6_x86_64-stable-pub-v6.0.1.tar.gz
     tar -C /opt -xzvf /root/freesurfer.tar.gz
     rm /root/freesurfer.tar.gz
 
@@ -74,9 +23,7 @@ Include: yum
     # fsl #
     #######
     wget --output-document=/root/fslinstaller.py https://fsl.fmrib.ox.ac.uk/fsldownloads/fslinstaller.py 
-    # FSL gets upset if it tries to install into a non-empty directory
-    # so here we remove the directory, install fsl, and then restore the scif metadata
-    python /root/fslinstaller.py -V 6.0.1 -d /etc/opt/fsl
+    python /root/fslinstaller.py -p -V 6.0.1 -d /opt/fsl
     rm /root/fslinstaller.py
 
 %appenv freesurfer
@@ -85,25 +32,90 @@ Include: yum
 	>&2 echo "freesurfer must be loaded before fsl"
 	exit 1
     fi
-    export FREESURFER_HOME=/etc/opt/freesurfer
-    NO_FSFAST=1 source $FREESURFER_HOME/SetUpFreeSurfer.sh
+    export NO_FSFAST=1
+    export FREESURFER_HOME=/opt/freesurfer
+    source $FREESURFER_HOME/SetUpFreeSurfer.sh
+
+%applabels freesurfer
+    License https://surfer.nmr.mgh.harvard.edu/fswiki/FreeSurferSoftwareLicense
+    URL https://surfer.nmr.mgh.harvard.edu/
+    Version 6.0.1
+
+%apphelp freesurfer
+    Using freesurfer requires a freesurfer license file.
+    A license file may be obtained from
+    https://surfer.nmr.mgh.harvard.edu/registration.html
+    Ensure that the license file is visible from the container,
+    and set the environment variable FS_LICENSE to point to it
+    (or copy the file to /opt/freesurfer/license.txt from
+    inside the container)
+
+%appenv fsl
+    export FSLDIR=/opt/fsl
+    source $FSLDIR/etc/fslconf/fsl.sh
+    export PATH=$FSLDIR/bin:$PATH
+
+%applabels fsl
+    License https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+    URL https://fsl.fmrib.ox.ac.uk/fsl/fslwiki
+    Version 6.0.1
+
+%apphelp fsl
+    Before using FSL you must agree to the license at
+    https://fsl.fmrib.ox.ac.uk/fsl/fslwiki/Licence
+
+%apphelp all
+    Set up environment for minc, ants, freesurfer, FSL, 
+    dcm2niix, and heudiconv
+
+    Using freesurfer requires a freesurfer license file.
+    A license file may be obtained from
+    https://surfer.nmr.mgh.harvard.edu/registration.html
+    Ensure that the license file is visible from the container,
+    and set the environment variable FS_LICENSE to point to it
+    (or copy the file to /opt/freesurfer/license.txt from
+    inside the container)
 
 %appenv freesurfer_nominc
     export NO_MINC=1
-    source $APPENV_freesurfer
+    source $SCIF_APPENV_freesurfer
 
-%appenv fsl
-    export FSLDIR=/etc/opt/fsl
-    source $FSLDIR/etc/fslconf/fsl.sh
+%appinstall heudiconv
+    virtualenv-3.6 /opt/heudiconv
+    source /opt/heudiconv/bin/activate
+    pip install heudiconv
+    deactivate
 
-%appenv minc
-    export PATH=/opt/minc/bin:$PATH
+%appenv heudiconv
+    source ${SCIF_APPENV_dcm2niix}
+    source /opt/heudiconv/bin/activate
 
-%appenv ants
-    export PATH=/opt/ants/bin:$PATH
+%apprun heudiconv
+    heudiconv "$@"
+
+%appinstall dcm2niix
+    git clone --branch v1.0.20181125 https://github.com/rordenlab/dcm2niix.git
+    cd dcm2niix
+    mkdir build && cd build
+    /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2niix ..
+    make
+    make install
+    rm -rf dcm2niix
+
+%appenv dcm2niix
+    export PATH=/opt/dcm2niix/bin:$PATH
+
+%apprun dcm2niix
+    dcm2niix "$@"
 
 %appenv all
-    source $APPENV_freesurfer_nominc
-    source $APPENV_fsl
-    source $APPENV_minc
-    source $APPENV_ants
+    source $SCIF_APPENV_freesurfer_nominc
+    source $SCIF_APPENV_fsl
+    source $SCIF_APPENV_minc
+    source $SCIF_APPENV_ants
+    source $SCIF_APPENV_heudiconv
+
+%labels
+    Maintainer Steven Tilley
+    Version dev
+
