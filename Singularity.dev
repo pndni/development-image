@@ -112,7 +112,7 @@ From: pndni/minc-and-ants-container:1.0.1
     source $SCIF_APPENV_freesurfer_nominc
     source $SCIF_APPENV_fsl
     source $SCIF_APPENV_minc
-    source $SCIF_APPENV_ants
+    export PATH=/scif/apps/ants/bin:$PATH
     source $SCIF_APPENV_heudiconv
 
 %labels
