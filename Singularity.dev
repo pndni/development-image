@@ -1,5 +1,5 @@
 Bootstrap: shub
-From: pndni/minc-and-ants-container:1.0.1
+From: pndni/minc-ants-fsl-and-fs-container:1.1.0
 # OSVersion: 7
 # MirrorURL: http://mirror.centos.org/centos-%{OSVERSION}/%{OSVERSION}/os/x86_64/
 # Include: yum
@@ -45,7 +45,7 @@ From: pndni/minc-and-ants-container:1.0.1
     heudiconv "$@"
 
 %appinstall dcm2niix
-    git clone --branch v1.0.20181125 https://github.com/rordenlab/dcm2niix.git
+    git clone --branch v1.0.20190410 https://github.com/rordenlab/dcm2niix.git
     cd dcm2niix
     mkdir build && cd build
     /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2niix ..
