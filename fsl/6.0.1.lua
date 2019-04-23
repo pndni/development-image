@@ -1,0 +1,11 @@
+local root="/opt/fsl"
+setenv("FSLDIR", root)
+setenv("FSLOUTPUTTYPE", "NIFTI_GZ")
+setenv("FSLMULTIFILEQUIT", "TRUE")
+setenv("FSLTCLSH", pathJoin(root, "bin/fsltclsh"))
+setenv("FSLWISH", pathJoin(root, "bin/fslwish"))
+setenv("FSLLOCKDIR", "")
+setenv("FSLMACHINELIST", "")
+setenv("FSLREMOTECALL", "")
+setenv("FSLGECUDAQ", "cuda.q")
+prepend_path("PATH", pathJoin(root, "bin"))

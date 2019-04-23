@@ -1,7 +1,12 @@
 #!/bin/bash
 
-ver=$(git describe --tags)
-ver=${ver:0:10}
+set -e
+
+if ! ver=$(git describe --tags --exact-match 2> /dev/null)
+then
+    ver=$(git rev-parse HEAD)
+    ver=${ver:0:10}
+fi
 if ! git diff --quiet
 then
     ver=${ver}-dirty
