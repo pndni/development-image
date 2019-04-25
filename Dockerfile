@@ -107,5 +107,7 @@ RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2n
 RUN rm -r /dcm2niix
 COPY dcm2niix /etc/modulefiles/dcm2niix
 
+ENV BASH_ENV=/etc/profile
+
 LABEL Maintainer="Steven Tilley"
 LABEL Version=dev
