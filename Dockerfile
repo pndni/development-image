@@ -107,9 +107,9 @@ RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2n
 RUN rm -r /dcm2niix
 COPY dcm2niix /etc/modulefiles/dcm2niix
 
-# set BASH_ENV to the same value it is set to in /etc/profile.d/z00_lmod.sh
-# This way lmod is set up even if /etc/profile is never sourced
-ENV BASH_ENV=/usr/share/lmod/lmod/init/bash
+# this script should be sourced to initiate lmod from inside a bash script if
+# not used interactively
+COPY set_up_lmod.sh /opt/set_up_lmod.sh
 
 LABEL Maintainer="Steven Tilley"
 LABEL Version=dev
