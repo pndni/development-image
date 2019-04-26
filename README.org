@@ -67,6 +67,9 @@ See [[https://lmod.readthedocs.io/en/latest/010_user.html][here]] for usage info
 module load minc
 module load ants
 #+END_EXAMPLE
+Note that there is no need to do any additional
+configuration (e.g. ~source $FREESURFER_HOME/SetUpFreeSurfer.sh~). It is
+all contained within the module files.
 
 * Creating singularity image
 ** Requirements
