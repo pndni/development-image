@@ -111,5 +111,12 @@ COPY dcm2niix /etc/modulefiles/dcm2niix
 # not used interactively
 COPY set_up_lmod.sh /opt/set_up_lmod.sh
 
+# make a bunch of files for potential mount points so that we don't rely on overlayFS
+RUN mkdir /scratch
+RUN mkdir -p /gpfs/fs0/scratch
+RUN mkdir /project
+RUN mkdir -p /gpfs/fs0/project
+RUN mkdir -p /gpfs/fs1/home
+
 LABEL Maintainer="Steven Tilley"
 LABEL Version=dev
