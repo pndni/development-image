@@ -1,0 +1,80 @@
+* Description
+This container contains commonly used software for MRI image processing.
+The inteded usage of this container is
+- provide a consistent development environment across different machines
+- serve as an example to install/build various software components
+- provide an environment for quick one-off jobs (not full analysis pipelines)
+- provide a starting point for pipeline development (e.g., trim down the Dockerfile
+  to only the required software)
+** Currently installed software
+- ants 2.3.1
+- minc 1.9.17
+- fsl 6.0.1
+- freesurfer 6.0.1
+- python 3.6 environment with
+  - bids-validator
+  - heudiconv
+  - nibabel
+  - nipype
+  - numpy
+  - pybids
+  - scipy
+- dcm2niix 1.0.20190410
+* Usage
+** Requirements
+- singularity
+** Interactive
+The following command should be used for interactive use
+#+BEGIN_EXAMPLE bash
+singularity exec --cleanenv development-image-1.0.0.simg /bin/bash --rcfile /etc/profile
+#+END_EXAMPLE
+Note, that one should not use ~singularity shell~, as this does not initialize bash correctly
+for the container.
+
+If being used on the Niagara scinet cluster, the following command will also bind the ~scratch~, ~project~, and ~home~ directories to the image
+(as opposed to the default, which is just the users home directory)
+#+BEGIN_EXAMPLE bash
+singularity exec --cleanenv --bind /home --bind /scratch --bind /project development-image-1.0.0.simg /bin/bash --rcfile /etc/profile
+#+END_EXAMPLE
+** Scripted
+Note, while scripted usage is acceptable for small jobs (e.g. quick registrations), for large scale analysis one should develope a pipeline specific container.
+
+Any commands run inside the container should be contained in a bash script which loads the required models (see below)
+#+BEGIN_EXAMPLE bash
+#!/bin/bash
+
+source /opt/set_up_lmod.sh
+# module loads
+
+# your commands
+#+END_EXAMPLE
+This can be called with 
+#+BEGIN_EXAMPLE bash
+singularity exec --cleanenv development-image-1.0.0.simg /bin/bash ./yourscript.sh
+#+END_EXAMPLE
+You will probably need to add the ~bind~ arguments as described above.
+*** Niagara caveat
+If you are calling the wrapper script with sbatch then it's possible that the working directory
+will not be correct inside the container. This seems to be because the working directory in the wrapper
+script is not ~/scratch/...~, but the full realized path ~/gpfs/fs0/scratch/...~. Therefore, to ensure that
+singularity is able to set the working directory inside the container to the same outside the container, use
+~--bind /gpfs/fs0/scratch~
+
+** Modules
+The container uses [[https://lmod.readthedocs.io/en/latest/][lmod]], just like niagara (although independent).
+See [[https://lmod.readthedocs.io/en/latest/010_user.html][here]] for usage information. For example, if you require minc and ants
+#+BEGIN_EXAMPLE
+module load minc
+module load ants
+#+END_EXAMPLE
+
+* Creating singularity image
+** Requirements
+   - docker
+   - local docker repository on port 5000
+   - singularity
+   - root
+** Command
+#+BEGIN_EXAMPLE bash
+sudo build_singularity.sh
+#+END_EXAMPLE
