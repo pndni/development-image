@@ -12,9 +12,17 @@ then
     ver=${ver}-dirty
 fi
 
+TMPDIR=$(mktemp -d -p /tmp_disk)
+export TMPDIR
+
 dockerimg=localhost:5000/development-image:$ver
 docker build -t $dockerimg .
 docker push $dockerimg
 
+SINGULARITY_TMPDIR=$(mktemp -d -p /tmp_disk)
+export SINGULARITY_TMPDIR
+
 export SINGULARITY_NOHTTPS=1
-singularity build development-image-$ver.simg docker://$dockerimg
+/opt/singularity/2.5.2/bin/singularity build development-image-$ver.simg docker://$dockerimg
+rm -rf $TMPDIR
+rm -rf $SINGULARITY_TMPDIR
