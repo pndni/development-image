@@ -92,7 +92,7 @@ RUN yum install -y python36 python36-pip python36-devel libstdc++-static pigz py
 RUN virtualenv-3.6 /opt/pyenv
 
 COPY pyenv /etc/modulefiles/pyenv
-RUN /opt/pyenv/bin/pip install numpy==1.16.3 scipy==1.2.1 bids-validator==1.2.3 pybids==0.8.0 heudiconv==0.5.4 nibabel==2.4.0 nipype==1.1.9 duecredit==0.7.0
+RUN /opt/pyenv/bin/pip install numpy==1.16.3 scipy==1.2.1 bids-validator==1.2.4 pybids==0.9.2 heudiconv==0.5.4 nibabel==2.4.0 nipype==1.2.0 duecredit==0.7.0 heudiconv==0.5.4 netCDF4==1.5.1.2
 
 # dcm2niix
 RUN git clone --branch v1.0.20190410 https://github.com/rordenlab/dcm2niix.git
