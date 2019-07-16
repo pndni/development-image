@@ -101,6 +101,9 @@ RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2n
 RUN rm -r /dcm2niix
 COPY dcm2niix /etc/modulefiles/dcm2niix
 
+# gnu/parallel
+RUN yum install -y parallel
+
 # this script should be sourced to initiate lmod from inside a bash script if
 # not used interactively
 COPY set_up_lmod.sh /opt/set_up_lmod.sh
