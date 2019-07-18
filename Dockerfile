@@ -116,5 +116,5 @@ RUN mkdir -p /gpfs/fs0/project
 RUN mkdir -p /gpfs/fs1/home
 
 LABEL Maintainer="Steven Tilley"
-LABEL Version=dev
+LABEL Version=2.3.1
 
