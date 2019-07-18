@@ -19,7 +19,7 @@ RUN tmpdir=$(mktemp -d) && \
     git clone --branch v2.3.1 https://github.com/ANTsX/ANTs.git ANTs_src && \
     mkdir ANTs_build && \
     pushd ANTs_build && \
-    /opt/cmake/bin/cmake ../ANTs_src -DITK_BUILD_MINC_SUPPORT=ON && \
+    /opt/cmake/bin/cmake ../ANTs_src -DITK_BUILD_MINC_SUPPORT=ON -DCMAKE_BUILD_TYPE=RELEASE && \
     make -j 2 && \
     popd && \
     mkdir -p /opt/ants/bin && \
@@ -97,7 +97,7 @@ RUN /opt/pyenv/bin/pip install numpy==1.16.3 scipy==1.2.1 bids-validator==1.2.4 
 # dcm2niix
 RUN git clone --branch v1.0.20190410 https://github.com/rordenlab/dcm2niix.git
 RUN mkdir /dcm2niix/build
-RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2niix .. && make && make install
+RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2niix -DCMAKE_BUILD_TYPE=RELEASE .. && make && make install
 RUN rm -r /dcm2niix
 COPY dcm2niix /etc/modulefiles/dcm2niix
 
