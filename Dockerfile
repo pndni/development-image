@@ -95,7 +95,7 @@ COPY pyenv /etc/modulefiles/pyenv
 RUN /opt/pyenv/bin/pip install numpy==1.16.3 scipy==1.2.1 bids-validator==1.2.4 pybids==0.9.4 heudiconv==0.5.4 nibabel==2.4.0 nipype==1.2.2 duecredit==0.7.0 heudiconv==0.5.4 netCDF4==1.5.1.2 git+https://github.com/pndni/pndni_utils.git@efcbb1f9fb0a5d1beea757c2edb3a3c043c2cec6
 
 # dcm2niix
-RUN git clone --branch v1.0.20190410 https://github.com/rordenlab/dcm2niix.git
+RUN git clone --branch v1.0.20190902 https://github.com/rordenlab/dcm2niix.git
 RUN mkdir /dcm2niix/build
 RUN cd /dcm2niix/build && /opt/cmake/bin/cmake -DCMAKE_INSTALL_PREFIX=/opt/dcm2niix -DCMAKE_BUILD_TYPE=RELEASE .. && make && make install
 RUN rm -r /dcm2niix
