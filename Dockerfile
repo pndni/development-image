@@ -115,6 +115,18 @@ RUN mkdir /project
 RUN mkdir -p /gpfs/fs0/project
 RUN mkdir -p /gpfs/fs1/home
 
-LABEL Maintainer="Steven Tilley"
-LABEL Version=dev
+ARG ver=dev
+ARG builddate=""
+ARG revision=""
 
+LABEL org.opencontainers.image.title=development-image \
+      org.opencontainers.image.source=https://github.com/pndni/development-image \
+      org.opencontainers.image.url=https://github.com/pndni/development-image \
+      org.opencontainers.image.revision=$ver \
+      org.opencontainers.image.created=$builddate \
+      org.opencontainers.image.version=$revision \
+      org.label-schema.build-date="" \
+      org.label-schema.license="" \
+      org.label-schema.name="" \
+      org.label-schema.schema-version="" \
+      org.label-schema.vendor=""
