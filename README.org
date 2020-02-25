@@ -19,7 +19,8 @@ The inteded usage of this container is
   - numpy
   - pybids
   - scipy
-- dcm2niix 1.0.20190410
+- dcm2niix 1.0.20190902
+- gnu-parallel
 * Usage
 ** Requirements
 - singularity
@@ -74,10 +75,13 @@ all contained within the module files.
 * Creating singularity image
 ** Requirements
    - docker
-   - local docker repository on port 5000
    - singularity
-   - root
 ** Command
+   Build docker image and push to docker hub
 #+BEGIN_EXAMPLE bash
-sudo build_singularity.sh
+./tools/build_docker.sh $gitrevision 0
+#+END_EXAMPLE
+   Build singularity image from docker hub
+#+BEGIN_EXAMPLE bash
+./tools/build_singularity.sh $gitrevision
 #+END_EXAMPLE
